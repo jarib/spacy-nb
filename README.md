@@ -6,32 +6,32 @@ Build a [spacy](https://spacy.io) model for `nb` (Norwegian Bokmål).
 
 Download and convert UD/NER data
 
-    $ ./tools/download.norne.sh
+    ./tools/download.norne.sh
 
 Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
-    $ ./tools/download.nnc.sh
+    ./tools/download.nnc.sh
 
 Convert XML files to plain text:
 
-    $ python -m tools.nnc2txt data/nnc
+    python -m tools.nnc2txt data/nnc
 
 Create word frequencies
 
-    $ python -m tools.word_freq data/nnc data/nnc.freqs.txt
+    python -m tools.word_freq data/nnc data/nnc.freqs.txt
 
 Create word vectors
 
-    $ python -m tools.word2vec data/nnc data/nnc.vectors.txt
+    python -m tools.word2vec data/nnc data/nnc.vectors.txt
 
 Init model
 
-    $ python -m spacy init-model nb data/nb-base data/nnc.freqs.txt --vectors-loc data/nnc.vectors.txt
+    python -m spacy init-model nb data/nb-base data/nnc.freqs.txt --vectors-loc data/nnc.vectors.txt
 
 Train tagger/parser
 
-    $ mkdir data/training
-    $ python -m spacy train nb data/training \
+    mkdir data/training
+    python -m spacy train nb data/training \
         data/norne-spacy/ud/nob/no-ud-train-ner.json \
         data/norne-spacy/ud/nob/no-ud-dev-ner.json \
         --vectors data/nb-base \
