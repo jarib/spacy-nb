@@ -68,12 +68,12 @@ def merge_counts(locs, out_loc):
             file_.write("%d\t%s\n" % (count, string))
 
 @plac.annotations(
-    input_dir=('Dir with .txt files to analyze', 'positional'), 
+    input_dir=('Dir with .txt files to analyze', 'positional'),
     output_path=('Dir to write frequencies', 'positional'),
-    skip_existing=('Skip file if it already exists', 'option', 's', bool), 
+    skip_existing=('Skip file if it already exists', 'option', 's', bool),
     n_jobs=('Number of workers', 'option', 'n', int)
 )
-def main(input_dir, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
+def main(input_dir, output_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
     tasks = []
     outputs = []
 
@@ -85,13 +85,12 @@ def main(input_dir, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
 
         if not skip_existing or not output_path.exists():
             tasks.append((input_path, output_path))
-    
+
     if tasks:
         parallelize(count_freqs, tasks, n_jobs)
 
-    result_path = input_dir.joinpath('all.freq')
-    print("Merging result to {}".format(result_path))
-    merge_counts(outputs, result_path)
+    print("Merging result to {}".format(output_path))
+    merge_counts(outputs, output_path)
 
 
 if __name__ == "__main__":

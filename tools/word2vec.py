@@ -36,7 +36,7 @@ class Corpus(object):
 
         return len(doc)
 
-    def file_contents(self):
+    def contents(self):
         for text_loc in self.directory.rglob('*.txt'):
             with io.open(text_loc, 'r', encoding='utf8') as file_:
                 text = file_.read()
@@ -44,7 +44,7 @@ class Corpus(object):
             yield text
 
     def __iter__(self):
-        for text in self.file_contents:
+        for text in self.contents():
             for line in text.split("\n"):
                 yield line
 
@@ -84,16 +84,15 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
 
     corpus = Corpus(in_dir)
 
-    # TODO: parallelize?
-
-    for text_no, text in enumerate(corpus.file_contents):
+    for text_no, text in enumerate(corpus.contents()):
         total_sents += text.count('\n')
 
         doc = nlp(text)
         total_words = len(doc)
         corpus.count_doc(doc)
 
-        logger.info("PROGRESS: at batch #%i, processed %i words", text_no, total_words)
+        if text_no % 50 == 0:
+            logger.info("PROGRESS: at batch #%i, processed %i words", text_no, total_words)
 
     model.iter = nr_iter
     model.corpus_count = total_sents
@@ -105,9 +104,15 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
             raw_vocab[nlp.vocab.strings[orth]] = freq
 
     model.build_vocab_from_freq(raw_vocab)
+    model.train(corpus, epochs=nr_iter, total_words=total_words)
 
-    model.train(corpus, total_examples=total_sents, epochs=nr_iter)
-    model.save(out_loc)
+    gensim_out = str(out_loc.with_suffix('.bin'))
+    word2vec_out = str(out_loc)
+
+    model.save(gensim_out)
+    model.wv.save_word2vec_format()
+
+    print('Wrote: gensim={}, word2vec={}'.format(gensim_out, word2vec_out))
 
 
 if __name__ == '__main__':
