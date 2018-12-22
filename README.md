@@ -8,7 +8,7 @@ Download and convert UD/NER data
 
     $ ./tools/download.norne.sh
 
-Download and extract [Norwegian News Corpus][nnc] data (2012-2014)
+Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
     $ ./tools/download.nnc.sh
 
@@ -16,11 +16,11 @@ Convert XML files to plain text:
 
     $ python -m tools.nnc2txt data/nnc
 
-Build and save word frequencies
+Create word frequencies
 
     $ python -m tools.word_freq data/nnc data/nnc.freqs.txt
 
-Build and save word vectors
+Create word vectors
 
     $ python -m tools.word2vec data/nnc data/nnc.vectors.txt
 
@@ -40,7 +40,7 @@ Train tagger/parser
         --gpu-id 1
 
 
-## Related
+## Links
 
 * [Norwegian News Corpus][nnc]
 * [Universal Dependencies for Bokmål](https://github.com/UniversalDependencies/UD_Norwegian-Bokmaal)
