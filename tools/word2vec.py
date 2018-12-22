@@ -34,8 +34,6 @@ class Corpus(object):
         for word in doc:
             self.counts.inc(word.orth, 1)
 
-        return len(doc)
-
     def contents(self):
         for text_loc in self.directory.rglob('*.txt'):
             with io.open(text_loc, 'r', encoding='utf8') as file_:
