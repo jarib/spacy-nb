@@ -53,9 +53,7 @@ def merge_counts(locs, out_loc):
     string_map = StringStore()
     counts = PreshCounter()
 
-
     for loc in locs:
-        print(loc)
         with io.open(loc, "r", encoding="utf8") as file_:
             for line in file_:
                 freq, word = line.strip().split("\t", 1)
@@ -69,11 +67,11 @@ def merge_counts(locs, out_loc):
 
 @plac.annotations(
     input_dir=('Dir with .txt files to analyze', 'positional'),
-    output_path=('Dir to write frequencies', 'positional'),
+    result_path=('File to write frequencies', 'positional'),
     skip_existing=('Skip file if it already exists', 'option', 's', bool),
     n_jobs=('Number of workers', 'option', 'n', int)
 )
-def main(input_dir, output_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
+def main(input_dir, result_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
     tasks = []
     outputs = []
 
@@ -89,8 +87,8 @@ def main(input_dir, output_path, skip_existing=True, n_jobs=multiprocessing.cpu_
     if tasks:
         parallelize(count_freqs, tasks, n_jobs)
 
-    print("Merging result to {}".format(output_path))
-    merge_counts(outputs, output_path)
+    print("Merging result to {}".format(result_path))
+    merge_counts(outputs, result_path)
 
 
 if __name__ == "__main__":
