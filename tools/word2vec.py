@@ -88,7 +88,7 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
         total_sents += text.count('\n')
 
         doc = nlp(text)
-        total_words = len(doc)
+        total_words += len(doc)
         corpus.count_doc(doc)
 
         if text_no % 50 == 0:
@@ -110,7 +110,7 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
     word2vec_out = str(out_loc)
 
     model.save(gensim_out)
-    model.wv.save_word2vec_format()
+    model.wv.save_word2vec_format(word2vec_out)
 
     print('Wrote: gensim={}, word2vec={}'.format(gensim_out, word2vec_out))
 
