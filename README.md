@@ -1,18 +1,14 @@
 # spacy-nb
 
-Build an `nb` model for [spacy](https://spacy.io).
-
-## Download
-
-- [Norwegian News Corpus][NNC]
+Build a [spacy](https://spacy.io) model for `nb` (Norwegian Bokmål).
 
 ## Usage
 
 Download and convert UD/NER data
 
-    $ ./tools/norne.sh
+    $ ./tools/download.norne.sh
 
-Download and extract [NNC] 2012-2014
+Download and extract [Norwegian News Corpus][nnc] data (2012-2014)
 
     $ ./tools/download.nnc.sh
 
@@ -44,4 +40,10 @@ Train tagger/parser
         --gpu-id 1
 
 
-[NNC](https://www.nb.no/sprakbanken/show?serial=oai%3Anb.no%3Asbr-4&lang=en)
+## Related
+
+* [Norwegian News Corpus][nnc]
+* [Universal Dependencies for Bokmål](https://github.com/UniversalDependencies/UD_Norwegian-Bokmaal)
+* [ltgoslo/norne](https://github.com/ltgoslo/norne) - NER on top of UD
+
+[nnc]: https://www.nb.no/sprakbanken/show?serial=oai%3Anb.no%3Asbr-4&lang=en
