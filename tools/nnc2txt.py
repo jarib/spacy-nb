@@ -2,26 +2,31 @@
 Extract plain text from an XML file in the Norwegian News Corpus.
 """
 
+import sys
 import plac
 from bs4 import BeautifulSoup
 import glob
 from pathlib import Path
 
+def main(directory = '.', skip_existing=True):
+    directory = Path(directory)
 
-def main(directory = '.'):
-    files = glob.glob(directory + "/**/*.xml")
-
-    for xml_file in files:
+    for xml_file in directory.rglob('*.xml'):
         xml_file = Path(xml_file)
+        output_file = xml_file.with_suffix('.txt')
 
-        print(xml_file)
+        try:
+            if not skip_existing or not output_file.exists():
+                print(xml_file)
 
-        with open(xml_file) as file:
-            soup = BeautifulSoup(file, "lxml-xml")
-            text = [p.text for p in soup("p")]
+                with open(xml_file) as file:
+                    soup = BeautifulSoup(file, "lxml-xml")
+                    text = [p.text for p in soup("p")]
 
-        with open(xml_file.with_suffix('.txt'), 'w') as f:
-            f.write("\n".join(text))
+                with open(output_file, 'w') as f:
+                    f.write("\n".join(text))
+        except UnicodeEncodeError as e:
+            print('ignoring unicode error', file=sys.stderr)
 
 
 
