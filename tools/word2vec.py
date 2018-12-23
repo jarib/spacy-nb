@@ -113,7 +113,7 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
     model.save(gensim_out)
     model.wv.save_word2vec_format(word2vec_out)
 
-    print('Wrote: gensim={}, word2vec={}'.format(gensim_out, word2vec_out))
+    logger.info('Wrote: gensim={}, word2vec={}'.format(gensim_out, word2vec_out))
 
 
 if __name__ == '__main__':

@@ -5,19 +5,25 @@ Extract plain text from an XML file in the Norwegian News Corpus.
 import sys
 import plac
 from bs4 import BeautifulSoup
-import glob
 from pathlib import Path
 
-def main(directory = '.', skip_existing=True):
+@plac.annotations(
+    directory=("Dir with files to process", 'positional'),
+    overwrite=("Overwrite existing texsts", 'flag', 'o'),
+    ignore=("Ignore files that match the given glob-style pattern", 'option', 'i'),
+)
+def main(directory = '.', overwrite=False, ignore=None):
     directory = Path(directory)
 
     for xml_file in directory.rglob('*.xml'):
-        xml_file = Path(xml_file)
         output_file = xml_file.with_suffix('.txt')
 
+        if ignore and xml_file.match(ignore):
+            continue
+
         try:
-            if not skip_existing or not output_file.exists():
-                print(xml_file)
+            if overwrite or not output_file.exists():
+                print('{} => {}'.format(xml_file, output_file))
 
                 with open(xml_file) as file:
                     soup = BeautifulSoup(file, "lxml-xml")

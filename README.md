@@ -12,9 +12,9 @@ Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
     ./tools/download.nnc.sh
 
-Convert XML files to plain text:
+Convert XML files to plain text, but ignore paths that match 'nno' (Norwegian Nynorsk):
 
-    python -m tools.nnc2txt data/nnc
+    python -m tools.nnc2txt data/nnc --ignore '*nno*'
 
 Create word frequencies
 
@@ -37,7 +37,7 @@ Train tagger/parser
         --vectors data/nb-base \
         --n-iter 30 \
         --gold-preproc \
-        --gpu-id 1
+        --use-gpu 1
 
 
 ## Links
