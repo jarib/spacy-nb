@@ -66,7 +66,7 @@ def merge_counts(locs, out_loc):
     with io.open(out_loc, "w", encoding="utf8") as file_:
         for orth, freq in counts:
             word = string_map[orth]
-            file_.write("{}\t{}\t{}\n".format(freq, df_counts[orth], word))
+            file_.write("{}\t{}\t{}\n".format(freq, df_counts[orth], repr(word)))
 
 
 @plac.annotations(

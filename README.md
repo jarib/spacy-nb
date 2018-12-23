@@ -18,7 +18,7 @@ Convert XML files to plain text, but ignore paths that match 'nno' ("new norwegi
 
 Create word frequencies
 
-    python -m tools.plain_word_freq data/nnc data/nnc.freqs.txt
+    python -m tools.word_freq data/nnc data/nnc.freqs.txt
 
 Create word vectors
 
