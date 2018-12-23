@@ -22,6 +22,7 @@ import ujson as json
 from gensim.models import Word2Vec
 from preshed.counter import PreshCounter
 import spacy
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +94,7 @@ def main(
 
     corpus = Corpus(in_dir)
 
-    for text_no, text in enumerate(corpus):
+    for text_no, text in tqmd(enumerate(corpus)):
         sent_count = text.count("\n")
         total_sents += sent_count
         total_size += len(text)
