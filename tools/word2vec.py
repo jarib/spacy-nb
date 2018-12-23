@@ -103,8 +103,6 @@ def main(
         total_words += len(doc)
         corpus.count_doc(doc)
 
-        logger.info("PROGRESS: at batch #%i, processed %i words", text_no, total_words)
-
     model.corpus_count = total_sents
 
     raw_vocab = defaultdict(int)
