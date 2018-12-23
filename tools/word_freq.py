@@ -27,10 +27,11 @@ from joblib import Parallel, delayed
 from pathlib import Path
 import multiprocessing
 
+from tqdm import tqdm
+
 
 def parallelize(func, iterator, n_jobs):
     Parallel(n_jobs=n_jobs)(delayed(func)(*item) for item in iterator)
-
 
 def count_freqs(input_loc, output_loc):
     print("{} => {}".format(input_loc, output_loc))
@@ -55,7 +56,7 @@ def merge_counts(locs, out_loc):
     counts = PreshCounter()
     df_counts = PreshCounter()
 
-    for loc in locs:
+    for loc in tqdm(locs):
         with io.open(loc, "r", encoding="utf8") as file_:
             for line in file_:
                 freq, word = line.strip().split("\t", 1)
