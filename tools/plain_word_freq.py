@@ -31,7 +31,7 @@ def main(input_dir, out_loc, workers=4):
         df_counts.update(wc.keys())
         word_counts.update(wc)
     with codecs.open(out_loc, "w", encoding="utf8") as f:
-        for word, df in df_counts.iteritems():
+        for word, df in df_counts.items():
             f.write(u"{freq}\t{df}\t{word}\n".format(word=repr(word), df=df, freq=word_counts[word]))
 
 
