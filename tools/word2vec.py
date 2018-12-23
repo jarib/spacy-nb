@@ -22,7 +22,6 @@ import ujson as json
 from gensim.models import Word2Vec
 from preshed.counter import PreshCounter
 import spacy
-from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +93,7 @@ def main(
 
     corpus = Corpus(in_dir)
 
-    for text_no, text in tqmd(enumerate(corpus)):
+    for text_no, text in enumerate(corpus):
         sent_count = text.count("\n")
         total_sents += sent_count
         total_size += len(text)
@@ -102,6 +101,11 @@ def main(
         doc = nlp(text)
         total_words += len(doc)
         corpus.count_doc(doc)
+
+        if text_no % 10 == 0:
+            logger.info(
+                "PROGRESS: at batch #%i, processed %i words", text_no, total_words
+            )
 
     model.corpus_count = total_sents
 
