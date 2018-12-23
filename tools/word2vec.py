@@ -89,7 +89,7 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
         total_words += len(doc)
         corpus.count_doc(doc)
 
-        if text_no % 50 == 0:
+        if text_no % 10 == 0:
             logger.info("PROGRESS: at batch #%i, processed %i words", text_no, total_words)
 
     model.iter = nr_iter
@@ -99,7 +99,10 @@ def main(in_dir, out_loc, lang="nb", negative=5, n_workers=4, window=5, size=128
 
     for orth, freq in corpus.counts:
         if freq >= min_count:
-            raw_vocab[nlp.vocab.strings[orth]] = freq
+            string = nlp.vocab.strings[orth]
+
+            if len(string.strip()) > 0:
+                raw_vocab[string] = freq
 
     model.build_vocab_from_freq(raw_vocab)
     model.train(corpus, epochs=nr_iter, total_words=total_words)
