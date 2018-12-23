@@ -76,7 +76,10 @@ def merge_counts(locs, out_loc):
     n_jobs=("Number of workers", "option", "n", int),
 )
 def main(
-    input_dir, result_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()
+    input_dir,
+    result_path,
+    skip_existing=True,
+    n_jobs=multiprocessing.cpu_count()
 ):
     tasks = []
     outputs = []

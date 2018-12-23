@@ -6,11 +6,12 @@ import sys
 import plac
 from bs4 import BeautifulSoup
 from pathlib import Path
+import fnmatch
 
 @plac.annotations(
     directory=("Dir with files to process", 'positional'),
-    overwrite=("Overwrite existing texsts", 'flag', 'o'),
-    ignore=("Ignore files that match the given glob-style pattern", 'option', 'i'),
+    overwrite=("Overwrite existing texts", 'flag', 'o'),
+    ignore=("Ignore files that match the given glob-style pattern", 'option', 'i', str),
 )
 def main(directory = '.', overwrite=False, ignore=None):
     directory = Path(directory)
@@ -18,7 +19,7 @@ def main(directory = '.', overwrite=False, ignore=None):
     for xml_file in directory.rglob('*.xml'):
         output_file = xml_file.with_suffix('.txt')
 
-        if ignore and xml_file.match(ignore):
+        if ignore and fnmatch.fnmatch(str(xml_file), ignore):
             continue
 
         try:

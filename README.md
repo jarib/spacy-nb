@@ -12,7 +12,7 @@ Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
     ./tools/download.nnc.sh
 
-Convert XML files to plain text, but ignore paths that match 'nno' (Norwegian Nynorsk):
+Convert XML files to plain text, but ignore paths that match 'nno' ("new norwegian"):
 
     python -m tools.nnc2txt data/nnc --ignore '*nno*'
 
@@ -31,6 +31,7 @@ Init model
 Train tagger/parser
 
     mkdir data/training
+
     python -m spacy train nb data/training \
         data/norne-spacy/ud/nob/no-ud-train-ner.json \
         data/norne-spacy/ud/nob/no-ud-dev-ner.json \
