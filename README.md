@@ -18,7 +18,7 @@ Convert XML files to plain text:
 
 Create word frequencies
 
-    python -m tools.word_freq data/nnc data/nnc.freqs.txt
+    python -m tools.plain_word_freq data/nnc data/nnc.freqs.txt
 
 Create word vectors
 
