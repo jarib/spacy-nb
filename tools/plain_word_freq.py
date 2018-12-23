@@ -23,16 +23,22 @@ def count_words(fpath):
 def main(input_dir, out_loc, workers=4):
     p = Pool(processes=workers)
     input_dir = Path(input_dir)
-    
-    counts = p.map(count_words, tqdm(list(input_dir.rglob('*.txt'))))
+
+    counts = p.map(count_words, tqdm(list(input_dir.rglob("*.txt"))))
     df_counts = Counter()
     word_counts = Counter()
+
     for wc in tqdm(counts):
         df_counts.update(wc.keys())
         word_counts.update(wc)
+
     with codecs.open(out_loc, "w", encoding="utf8") as f:
         for word, df in df_counts.items():
-            f.write(u"{freq}\t{df}\t{word}\n".format(word=repr(word), df=df, freq=word_counts[word]))
+            f.write(
+                "{freq}\t{df}\t{word}\n".format(
+                    word=repr(word), df=df, freq=word_counts[word]
+                )
+            )
 
 
 if __name__ == "__main__":

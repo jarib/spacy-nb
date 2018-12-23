@@ -1,4 +1,3 @@
-
 """
     Count words from a list of .txt files
 
@@ -12,6 +11,7 @@ from __future__ import unicode_literals, print_function
 import plac
 import io
 import spacy
+
 from spacy.lang.nb import Norwegian
 
 from spacy.strings import StringStore
@@ -33,12 +33,12 @@ def parallelize(func, iterator, n_jobs):
 
 
 def count_freqs(input_loc, output_loc):
-    print('{} => {}'.format(input_loc, output_loc))
-    tokenizer = Norwegian.Defaults.create_tokenizer()
+    print("{} => {}".format(input_loc, output_loc))
 
+    tokenizer = Norwegian.Defaults.create_tokenizer()
     counts = PreshCounter()
 
-    with open(input_loc, 'r') as file:
+    with open(input_loc, "r") as file:
         for line in file:
             doc = tokenizer(line.strip())
             doc.count_by(ORTH, counts=counts)
@@ -49,9 +49,11 @@ def count_freqs(input_loc, output_loc):
             if not string.isspace():
                 file_.write("%d\t%s\n" % (freq, string))
 
+
 def merge_counts(locs, out_loc):
     string_map = StringStore()
     counts = PreshCounter()
+    df_counts = PreshCounter()
 
     for loc in locs:
         with io.open(loc, "r", encoding="utf8") as file_:
@@ -59,26 +61,30 @@ def merge_counts(locs, out_loc):
                 freq, word = line.strip().split("\t", 1)
                 orth = string_map.add(word)
                 counts.inc(orth, int(freq))
+                df_counts.inc(orth, 1)
 
     with io.open(out_loc, "w", encoding="utf8") as file_:
-        for orth, count in counts:
-            string = string_map[orth]
-            file_.write("%d\t%s\n" % (count, string))
+        for orth, freq in counts:
+            word = string_map[orth]
+            file_.write("{}\t{}\t{}\n".format(freq, df_counts[orth], word))
+
 
 @plac.annotations(
-    input_dir=('Dir with .txt files to analyze', 'positional'),
-    result_path=('File to write frequencies', 'positional'),
-    skip_existing=('Skip file if it already exists', 'option', 's', bool),
-    n_jobs=('Number of workers', 'option', 'n', int)
+    input_dir=("Dir with .txt files to analyze", "positional"),
+    result_path=("File to write frequencies", "positional"),
+    skip_existing=("Skip file if it already exists", "option", "s", bool),
+    n_jobs=("Number of workers", "option", "n", int),
 )
-def main(input_dir, result_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()):
+def main(
+    input_dir, result_path, skip_existing=True, n_jobs=multiprocessing.cpu_count()
+):
     tasks = []
     outputs = []
 
     input_dir = Path(input_dir)
 
-    for input_path in input_dir.rglob('*.txt'):
-        output_path = input_path.with_suffix('.freq')
+    for input_path in input_dir.rglob("*.txt"):
+        output_path = input_path.with_suffix(".freq")
         outputs.append(output_path)
 
         if not skip_existing or not output_path.exists():
