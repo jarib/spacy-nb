@@ -8,6 +8,28 @@ Download and convert UD/NER data
 
     ./tools/download.norne.sh
 
+Download and unpack pre-trained word2vec model
+
+    ./tools/download.vectors.sh
+
+Create Spacy model with vectors
+
+    python -m spacy init-model nb data/nb-base --vectors-loc data/vectors/model.txt
+
+Train tagger/parser
+
+    mkdir data/training
+
+    python -m spacy train nb data/training \
+        data/norne-spacy/ud/nob/no-ud-train-ner.json \
+        data/norne-spacy/ud/nob/no-ud-dev-ner.json \
+        --vectors data/nb-base \
+        --n-iter 30 \
+        --gold-preproc \
+        --use-gpu 1
+
+## Train word2vec from Norwegian News Corpus (experimental)
+
 Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
     ./tools/download.nnc.sh
@@ -28,23 +50,11 @@ Init model
 
     python -m spacy init-model nb data/nb-base data/nnc.freqs.txt --vectors-loc data/nnc.vectors.txt
 
-Train tagger/parser
-
-    mkdir data/training
-
-    python -m spacy train nb data/training \
-        data/norne-spacy/ud/nob/no-ud-train-ner.json \
-        data/norne-spacy/ud/nob/no-ud-dev-ner.json \
-        --vectors data/nb-base \
-        --n-iter 30 \
-        --gold-preproc \
-        --use-gpu 1
-
-
 ## Links
 
 * [Norwegian News Corpus][nnc]
 * [Universal Dependencies for Bokmål](https://github.com/UniversalDependencies/UD_Norwegian-Bokmaal)
 * [ltgoslo/norne](https://github.com/ltgoslo/norne) - NER on top of UD
+* [Pre-trained word vectors](http://vectors.nlpl.eu/repository/)
 
 [nnc]: https://www.nb.no/sprakbanken/show?serial=oai%3Anb.no%3Asbr-4&lang=en
