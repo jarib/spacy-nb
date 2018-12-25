@@ -176,7 +176,11 @@ class Model(object):
         )
 
 
-def main(output_dir):
+@plac.annotations(
+    output_dir=("Dir where results will be saved", "positional"),
+    model_id=("Dir where results will be saved", "option", "m"),
+)
+def main(output_dir, model_id=None):
     output_dir = Path(output_dir)
 
     # fmt: off
@@ -193,6 +197,9 @@ def main(output_dir):
 
     for m in models:
         if m.id() in IGNORED:
+            continue
+
+        if model_id and model_id != m.id():
             continue
 
         m.out = output_dir
