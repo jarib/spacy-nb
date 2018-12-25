@@ -16,7 +16,7 @@ from pathlib import Path
 
 class Model(object):
     @staticmethod
-    def all(repository_id="11", language="nob", corpus_id=None):
+    def all(repository_id="11", language="nob", corpus_id=None, out=None):
         repo = requests.get(
             "http://vectors.nlpl.eu/repository/{}.json".format(repository_id)
         ).json()
@@ -54,7 +54,7 @@ class Model(object):
             model["corpus"] = [corpora[corpus_id] for corpus_id in model["corpus"]]
             model["algorithm"] = algorithms[model["algorithm"]]
 
-            result.append(Model(model))
+            result.append(Model(model, out=out))
 
         return result
 
@@ -123,7 +123,7 @@ class Model(object):
                 self.model_path,
             ]
 
-            print("Building vectors model (spacy init-model)")
+            print("Building vectors model (spacy init-model) for {}".format(self.attrs))
             result = subprocess.run(cmd)
 
             if result.returncode != 0:
@@ -162,14 +162,23 @@ class Model(object):
     def create_report(self):
         report_path = self.out.joinpath("report.json")
         print("Writing report to {}".format(report_path))
+
         report = {"vectors": self.attrs, "training": []}
 
         for model_dir in self.training_path.glob("*"):
-            with model_dir.joinpath("meta.json").open(encoding="utf8") as f:
-                report["training"].append(ujson.loads(f.read()))
+            report["training"].append(self.read_meta(model_dir))
+
+        best_model_path = self.training_path.joinpath("model-best")
+
+        if best_model_path.exists():
+            report["best"] = self.read_meta(best_model_path)
 
         with report_path.open("w") as f:
             f.write(ujson.dumps(report))
+
+    def read_meta(self, path):
+        with path.joinpath("meta.json").open(encoding="utf8") as f:
+            return ujson.loads(f.read())
 
     def id(self):
         return "{}-{}".format(self.attrs["repository_id"], self.attrs["id"])
@@ -200,7 +209,10 @@ def main(output_dir, model_id=None, n_iter=15):
     NORWEGIAN_NEWS_CORPUS = 79
 
     models = Model.all(
-        repository_id=11, language="nob", corpus_id=NORWEGIAN_NEWS_CORPUS
+        repository_id=11,
+        language="nob",
+        corpus_id=NORWEGIAN_NEWS_CORPUS,
+        out=output_dir
     )
 
     for m in models:
@@ -209,8 +221,6 @@ def main(output_dir, model_id=None, n_iter=15):
 
         if model_id and model_id != m.id():
             continue
-
-        m.out = output_dir
 
         m.fetch()
         m.train(n_iter=n_iter)
