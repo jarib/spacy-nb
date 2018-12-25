@@ -13,9 +13,6 @@ from pprint import pprint
 
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
-
 
 class Model(object):
     @staticmethod
@@ -91,23 +88,25 @@ class Model(object):
         zip_path = self.out.with_suffix(".zip")
 
         if force or not self.out.exists():
+            print("downloading to {}".format(zip_path))
             res = subprocess.call(["curl", "-o", str(zip_path), self.url()])
 
             if res != 0:
                 raise ValueError("download failed {}".format(self.url()))
 
+            print("unzippiing to {}".format(self.out))
             res = subprocess.call(["unzip", "-od", str(self.out), str(zip_path)])
 
             if res != 0:
                 raise ValueError("unzip failed {}".format(str(zip_path)))
 
-    def train(self, force=False):
+    def train(self, force=False, n_iter=15):
         self.training_path.mkdir(exist_ok=True)
 
-        spacy_model_path = self.training_path.joinpath("vectors")
+        vectors_model_path = self.out.joinpath("vectors")
 
-        if force or not spacy_model_path.exists():
-            shutil.rmtree(spacy_model_path, ignore_errors=True)
+        if force or not vectors_model_path.exists():
+            shutil.rmtree(vectors_model_path, ignore_errors=True)
 
             cmd = [
                 sys.executable,
@@ -115,12 +114,12 @@ class Model(object):
                 "spacy",
                 "init-model",
                 "nb",
-                spacy_model_path,
+                vectors_model_path,
                 "--vectors-loc",
                 self.model_path,
             ]
 
-            logger.info("init-model")
+            print("Building vectors model (spacy init-model)")
             result = subprocess.run(cmd)
 
             if result.returncode != 0:
@@ -139,30 +138,20 @@ class Model(object):
             "data/norne-spacy/ud/nob/no-ud-train-ner.json",
             "data/norne-spacy/ud/nob/no-ud-dev-ner.json",
             "--vectors",
-            str(spacy_model_path),
+            str(vectors_model_path),
             "--n-iter",
-            "15",
-            "--gold-preproc",
+            str(n_iter),
             "--use-gpu",
             "1",
         ]
 
-        log_path = self.training_path.joinpath("train.log")
+        print("TRAINING")
+        print("cmd: {}".format(" ".join(cmd)))
 
-        with subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, encoding="utf8"
-        ) as proc, open(log_path, "w") as log:
-            for line in iter(lambda: proc.stdout.readline(), ""):
-                sys.stdout.write(line)
+        result = subprocess.run(cmd)
 
-                if not "\r" in line:
-                    log.write(line)
-                    log.flush()
-
-            if proc.wait() != 0:
-                raise ValueError(
-                    "failed to train {}, see {}".format(self.id(), log_path)
-                )
+        if result.returncode != 0:
+            raise ValueError("failed to train {}, see {}".format(self.id()))
 
     def id(self):
         return "{}-{}".format(self.attrs["repository_id"], self.attrs["id"])
@@ -178,9 +167,10 @@ class Model(object):
 
 @plac.annotations(
     output_dir=("Dir where results will be saved", "positional"),
-    model_id=("Dir where results will be saved", "option", "m"),
+    model_id=("Dir where results will be saved", "option", "m", str),
+    n_iter=("Number of iterations", "option", "n", int),
 )
-def main(output_dir, model_id=None):
+def main(output_dir, model_id=None, n_iter=15):
     output_dir = Path(output_dir)
 
     # fmt: off
@@ -205,7 +195,7 @@ def main(output_dir, model_id=None):
         m.out = output_dir
 
         m.fetch()
-        m.train()
+        m.train(n_iter=n_iter)
 
 
 if __name__ == "__main__":
