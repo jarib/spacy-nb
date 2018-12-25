@@ -101,7 +101,8 @@ class Model(object):
                 if res != 0:
                     raise ValueError("unzip failed {}".format(str(zip_path)))
         finally:
-            zip_path.unlink()
+            if zip_path.exists():
+                zip_path.unlink()
 
     def train(self, force=False, n_iter=15):
         self.training_path.mkdir(exist_ok=True)
