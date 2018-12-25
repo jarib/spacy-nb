@@ -12,7 +12,7 @@ Download and unpack pre-trained word2vec model
 
     ./tools/download.vectors.sh
 
-Create Spacy model with vectors
+Create spacy model with vectors
 
     python -m spacy init-model nb data/nb-base --vectors-loc data/vectors/model.txt
 
