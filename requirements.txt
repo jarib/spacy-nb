@@ -15,11 +15,9 @@ chardet==3.0.4
 Click==7.0
 cymem==2.0.2
 cytoolz==0.9.0.1
-de-core-news-sm==2.0.0
 decorator==4.3.0
 dill==0.2.8.2
 docutils==0.14
-fr-core-news-sm==2.0.0
 gensim==3.6.0
 idna==2.8
 ipykernel==5.1.0
