@@ -211,9 +211,8 @@ def main(output_dir, model_id=None, n_iter=15):
 
         m.out = output_dir
 
-        # m.fetch()
-        # m.train(n_iter=n_iter)
-        m.create_report()
+        m.fetch()
+        m.train(n_iter=n_iter)
 
 
 if __name__ == "__main__":
