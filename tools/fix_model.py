@@ -1,3 +1,10 @@
+"""
+
+Adds vectors.name to meta.json.
+See https://github.com/explosion/spaCy/issues/3093
+
+"""
+
 import plac
 import ujson
 from pathlib import Path

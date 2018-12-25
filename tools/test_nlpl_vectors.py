@@ -87,18 +87,21 @@ class Model(object):
     def fetch(self, force=False):
         zip_path = self.out.with_suffix(".zip")
 
-        if force or not self.out.exists():
-            print("downloading to {}".format(zip_path))
-            res = subprocess.call(["curl", "-o", str(zip_path), self.url()])
+        try:
+            if force or not self.out.exists():
+                print("downloading to {}".format(zip_path))
+                res = subprocess.call(["curl", "-o", str(zip_path), self.url()])
 
-            if res != 0:
-                raise ValueError("download failed {}".format(self.url()))
+                if res != 0:
+                    raise ValueError("download failed {}".format(self.url()))
 
-            print("unzippiing to {}".format(self.out))
-            res = subprocess.call(["unzip", "-od", str(self.out), str(zip_path)])
+                print("unzippiing to {}".format(self.out))
+                res = subprocess.call(["unzip", "-od", str(self.out), str(zip_path)])
 
-            if res != 0:
-                raise ValueError("unzip failed {}".format(str(zip_path)))
+                if res != 0:
+                    raise ValueError("unzip failed {}".format(str(zip_path)))
+        finally:
+            zip_path.unlink()
 
     def train(self, force=False, n_iter=15):
         self.training_path.mkdir(exist_ok=True)
@@ -153,6 +156,20 @@ class Model(object):
         if result.returncode != 0:
             raise ValueError("failed to train {}, see {}".format(self.id()))
 
+        self.create_report()
+
+    def create_report(self):
+        report_path = self.out.joinpath("report.json")
+        print("Writing report to {}".format(report_path))
+        report = {"vectors": self.attrs, "training": []}
+
+        for model_dir in self.training_path.glob("*"):
+            with model_dir.joinpath("meta.json").open(encoding="utf8") as f:
+                report["training"].append(ujson.loads(f.read()))
+
+        with report_path.open("w") as f:
+            f.write(ujson.dumps(report))
+
     def id(self):
         return "{}-{}".format(self.attrs["repository_id"], self.attrs["id"])
 
@@ -194,8 +211,9 @@ def main(output_dir, model_id=None, n_iter=15):
 
         m.out = output_dir
 
-        m.fetch()
-        m.train(n_iter=n_iter)
+        # m.fetch()
+        # m.train(n_iter=n_iter)
+        m.create_report()
 
 
 if __name__ == "__main__":
