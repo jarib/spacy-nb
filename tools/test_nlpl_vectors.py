@@ -85,7 +85,6 @@ class Model(object):
 
         self.meta_path = self.out.joinpath("meta.json")
         self.model_path = self.out.joinpath("model.txt")
-
         self.training_path = self.out.joinpath("training")
 
     def fetch(self, force=False):
@@ -155,8 +154,10 @@ class Model(object):
         ) as proc, open(log_path, "w") as log:
             for line in iter(lambda: proc.stdout.readline(), ""):
                 sys.stdout.write(line)
+
                 if not "\r" in line:
                     log.write(line)
+                    log.flush()
 
             if proc.wait() != 0:
                 raise ValueError(
@@ -181,12 +182,6 @@ def main(output_dir):
     # fmt: off
     IGNORED = [
         "11-58", # encoding issues
-        "11-76", # too big for testing
-        "11-77", # too big for testing
-        "11-78", # too big for testing
-        "11-79", # too big for testing
-        "11-80", # too big for testing
-        "11-81", # too big for testing
     ]
     # fmt: on
 
