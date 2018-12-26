@@ -133,7 +133,7 @@ class Model(object):
                 print("Training path exists and force=False, skipping")
                 return
 
-        self.training_path.mkdir(exists_ok=True)
+        self.training_path.mkdir(exist_ok=True)
 
         # run training and collect output to a file
         cmd = [
