@@ -121,16 +121,28 @@ def main(output_dir, evaluate=False):
         print()
 
         print_accuracy(report["best"]["meta"]["accuracy"], indent=1)
-        print("\n")
+
 
         if evaluate:
             print()
             print('Evaluate')
             print('--------')
-            res = subprocess.run([sys.executable, '-m', 'spacy', 'evaluate', '-G', '-g', '1', report['best']['path'], "data/norne-spacy/ud/nob/no-ud-test-ner.json"])
+            
+            res = subprocess.run([
+                sys.executable, '-m', 'spacy', 'evaluate', '-G', '-g', '1', report['best']['path'], "data/norne-spacy/ud/nob/no-ud-test-ner.json"
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
 
             if res.returncode != 0:
                print('Evaluation failed!')
+               print(res.stderr)
+
+            for line in res.stdout.split("\n"):
+                if not '===' in line:
+                    print("\t", line)
+                
+            
+
+        print("\n")
 
 
 if __name__ == "__main__":
