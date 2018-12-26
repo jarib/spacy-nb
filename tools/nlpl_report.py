@@ -115,8 +115,11 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
         print("\tAlgorithm: {}".format(vec["algorithm"]["name"]))
         print("\tCorpus   : {}".format(", ".join(corp_desc)))
         print(
-            "\tVectors  : dimensions={}, iterations={}, vocab size={}".format(
-                vec["dimensions"], vec["iterations"], vec["vocabulary size"]
+            "\tVectors  : dimensions={}, window={}, iterations={}, vocab size={}".format(
+                vec["dimensions"],
+                vec["window"],
+                vec["iterations"],
+                vec["vocabulary size"],
             )
         )
 
