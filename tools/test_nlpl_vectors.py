@@ -102,8 +102,6 @@ class Model(object):
                 zip_path.unlink()
 
     def train(self, force=False, n_iter=15):
-        self.training_path.mkdir(exist_ok=True)
-
         vectors_model_path = self.out.joinpath("vectors")
 
         if force or not vectors_model_path.exists():
@@ -127,6 +125,15 @@ class Model(object):
                 raise ValueError(
                     "failed to build spacy model for {}\n".format(self.id())
                 )
+
+        if self.training_path.exists():
+            if force:
+                shutil.rmtree(self.training_path)
+            else:
+                print("Training path exists and force=False, skipping")
+                return
+
+        self.training_path.mkdir(exists_ok=True)
 
         # run training and collect output to a file
         cmd = [
@@ -154,29 +161,6 @@ class Model(object):
         if result.returncode != 0:
             raise ValueError("failed to train {}".format(self.id()))
 
-        self.create_report()
-
-    def create_report(self):
-        report_path = self.out.joinpath("report.json")
-        print("Writing report to {}".format(report_path))
-
-        report = {"vectors": self.attrs, "training": []}
-
-        for model_dir in self.training_path.glob("*"):
-            report["training"].append(self.read_meta(model_dir))
-
-        best_model_path = self.training_path.joinpath("model-best")
-
-        if best_model_path.exists():
-            report["best"] = self.read_meta(best_model_path)
-
-        with report_path.open("w") as f:
-            f.write(ujson.dumps(report))
-
-    def read_meta(self, path):
-        with path.joinpath("meta.json").open(encoding="utf8") as f:
-            return ujson.loads(f.read())
-
     def id(self):
         return "{}-{}".format(self.attrs["repository_id"], self.attrs["id"])
 
@@ -193,8 +177,9 @@ class Model(object):
     output_dir=("Dir where results will be saved", "positional"),
     model_id=("Dir where results will be saved", "option", "m", str),
     n_iter=("Number of iterations", "option", "n", int),
+    force=("Overwrite existing data", "option", "f", bool),
 )
-def main(output_dir, model_id=None, n_iter=15):
+def main(output_dir, model_id=None, n_iter=15, force=False):
     output_dir = Path(output_dir)
 
     # fmt: off
@@ -203,14 +188,7 @@ def main(output_dir, model_id=None, n_iter=15):
     ]
     # fmt: on
 
-    NORWEGIAN_NEWS_CORPUS = 79
-
-    models = Model.all(
-        repository_id=11,
-        language="nob",
-        corpus_id=NORWEGIAN_NEWS_CORPUS,
-        out=output_dir,
-    )
+    models = Model.all(repository_id=11, language="nob", out=output_dir)
 
     for m in models:
         if m.id() in IGNORED:
@@ -219,8 +197,8 @@ def main(output_dir, model_id=None, n_iter=15):
         if model_id and model_id != m.id():
             continue
 
-        m.fetch()
-        m.train(n_iter=n_iter)
+        m.fetch(force=force)
+        m.train(n_iter=n_iter, force=force)
 
 
 if __name__ == "__main__":

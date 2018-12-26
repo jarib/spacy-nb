@@ -9,13 +9,17 @@ import sys
 import shutil
 
 from pathlib import Path
+import srsly
+import os
 
 
-def print_accuracy(scores, header=True):
+def print_accuracy(scores, header=True, indent=0):
+    ind = "\t" * indent
+
     if header:
         print(
-            "{:<7}{:<7}{:<7}{:<7}{:<7}{:<7}".format(
-                "UAS", "NER P.", "NER R.", "NER F.", "Tag %", "Token %"
+            "{}{:<7}{:<7}{:<7}{:<7}{:<7}{:<7}".format(
+                ind, "UAS", "NER P.", "NER R.", "NER F.", "Tag %", "Token %"
             )
         )
 
@@ -28,20 +32,57 @@ def print_accuracy(scores, header=True):
         "{:.3f}".format(scores["token_acc"]),
     ]
 
-    print(" ".join(strings))
+    print(ind + " ".join(strings))
+
+
+def get_size(start_path):
+    total_size = 0
+
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+
+    return total_size
 
 
 @plac.annotations(output_dir=("Output dir for models", "positional"))
 def main(output_dir):
     output_dir = Path(output_dir)
-
     reports = []
 
-    for report in output_dir.glob("*/report.json"):
-        with report.open() as f:
-            reports.append(ujson.loads(f.read()))
+    for work_dir in output_dir.glob("*"):
+        report = {"path": str(work_dir), "training": []}
+        report["vectors"] = srsly.read_json(work_dir.joinpath("meta.json"))
 
-    for report in reports:
+        model_dirs = list(work_dir.joinpath("training").glob("model[0-9]*"))
+
+        for model_dir in model_dirs:
+            model = {
+                "meta": srsly.read_json(model_dir.joinpath("meta.json")),
+                "path": str(model_dir),
+                "size": get_size(model_dir),
+            }
+            report["training"].append(model)
+
+        best_dir = work_dir.joinpath("training/model-best")
+
+        if best_dir.exists():
+            report["best"] = {
+                "meta": srsly.read_json(model_dir.joinpath("meta.json")),
+                "path": str(best_dir),
+                "size": get_size(best_dir),
+            }
+
+        reports.append(report)
+
+    for (idx, report) in enumerate(reports):
+        head = "Model {:>3}".format(idx)
+        print("=" * len(head))
+        print(head)
+        print("=" * len(head))
+        print("\tPath: {}".format(report["path"]))
+
         vec = report["vectors"]
         corp_desc = []
 
@@ -72,16 +113,18 @@ def main(output_dir):
         print("--------")
 
         for (idx, training) in enumerate(report["training"]):
-            if "accuracy" in training:
-                print_accuracy(training["accuracy"], header=idx == 0)
+            if "accuracy" in training["meta"]:
+                print_accuracy(training["meta"]["accuracy"], header=idx == 0, indent=1)
 
         print()
-        print("Best model")
-        print("----------")
+        print("Best")
+        print("----")
+        print("\tPath: {}".format(report["best"]["path"]))
+        print("\tSize: {} MB".format(round(report["best"]["size"] / 1024 ** 2)))
+        print()
 
-        print_accuracy(report["best"]["accuracy"])
-
-        print("-" * 42)
+        print_accuracy(report["best"]["meta"]["accuracy"], indent=1)
+        print("\n")
 
 
 if __name__ == "__main__":
