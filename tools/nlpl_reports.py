@@ -9,6 +9,8 @@ from pathlib import Path
 import srsly
 import os
 
+from .fix_model import fix_model
+
 
 def print_accuracy(scores, header=True, indent=0):
     ind = "\t" * indent
@@ -43,7 +45,10 @@ def get_size(start_path):
     return total_size
 
 
-@plac.annotations(output_dir=("Output dir for models", "positional"), evaluate=('Run "spacy evaluate" for each model', 'flag', 'e', bool))
+@plac.annotations(
+    output_dir=("Output dir for models", "positional"),
+    evaluate=('Run "spacy evaluate" for each model', "flag", "e", bool),
+)
 def main(output_dir, evaluate=False):
     output_dir = Path(output_dir)
     reports = []
@@ -55,6 +60,8 @@ def main(output_dir, evaluate=False):
         model_dirs = list(work_dir.joinpath("training").glob("model[0-9]*"))
 
         for model_dir in model_dirs:
+            fix_model(model_dir)
+
             model = {
                 "meta": srsly.read_json(model_dir.joinpath("meta.json")),
                 "path": str(model_dir),
@@ -65,6 +72,8 @@ def main(output_dir, evaluate=False):
         best_dir = work_dir.joinpath("training/model-best")
 
         if best_dir.exists():
+            fix_model(best_dir)
+
             report["best"] = {
                 "meta": srsly.read_json(model_dir.joinpath("meta.json")),
                 "path": str(best_dir),
@@ -116,31 +125,46 @@ def main(output_dir, evaluate=False):
         print()
         print("Best")
         print("----")
+
+        if not "best" in report:
+            print("\n\tNone saved.")
+            return
+
         print("\tPath: {}".format(report["best"]["path"]))
         print("\tSize: {} MB".format(round(report["best"]["size"] / 1024 ** 2)))
         print()
 
         print_accuracy(report["best"]["meta"]["accuracy"], indent=1)
 
-
         if evaluate:
             print()
-            print('Evaluate')
-            print('--------')
-            
-            res = subprocess.run([
-                sys.executable, '-m', 'spacy', 'evaluate', '-G', '-g', '1', report['best']['path'], "data/norne-spacy/ud/nob/no-ud-test-ner.json"
-            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
+            print("Evaluate")
+            print("--------")
+
+            res = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "spacy",
+                    "evaluate",
+                    "-G",
+                    "-g",
+                    "1",
+                    report["best"]["path"],
+                    "data/norne-spacy/ud/nob/no-ud-test-ner.json",
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                encoding="utf8",
+            )
 
             if res.returncode != 0:
-               print('Evaluation failed!')
-               print(res.stderr)
+                print("Evaluation failed!")
+                print(res.stderr)
 
             for line in res.stdout.split("\n"):
-                if not '===' in line:
+                if not "===" in line:
                     print("\t", line)
-                
-            
 
         print("\n")
 

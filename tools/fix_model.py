@@ -10,7 +10,7 @@ import srsly
 from pathlib import Path
 
 
-def main(model_path):
+def fix_model(model_path):
     model_path = Path(model_path)
     meta_path = model_path.joinpath("meta.json")
 
@@ -20,8 +20,8 @@ def main(model_path):
     meta["vectors"]["name"] = tagger_cfg["pretrained_vectors"]
 
     srsly.write_json(meta_path, meta)
-    print('fixed')
+    print("fixed {}".format(model_path))
 
 
 if __name__ == "__main__":
-    plac.call(main)
+    plac.call(fix_model)
