@@ -48,8 +48,9 @@ def get_size(start_path):
 @plac.annotations(
     output_dir=("Output dir for models", "positional"),
     evaluate=('Run "spacy evaluate" for each model', "flag", "e", bool),
+    sort_metric=("Metric to sort by", "option", "s", str),
 )
-def main(output_dir, evaluate=False):
+def main(output_dir, evaluate=False, sort_metric="ents_f"):
     output_dir = Path(output_dir)
     reports = []
 
@@ -81,6 +82,10 @@ def main(output_dir, evaluate=False):
             }
 
         reports.append(report)
+
+    reports.sort(
+        key=lambda r: r["best"]["meta"]["accuracy"][sort_metric] if "best" in r else 0
+    )
 
     for (idx, report) in enumerate(reports):
         head = "Model {:>3}".format(idx)
