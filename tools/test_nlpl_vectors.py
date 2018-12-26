@@ -8,9 +8,6 @@ import subprocess
 import sys
 import shutil
 
-import logging
-from pprint import pprint
-
 from pathlib import Path
 
 
@@ -155,7 +152,7 @@ class Model(object):
         result = subprocess.run(cmd)
 
         if result.returncode != 0:
-            raise ValueError("failed to train {}, see {}".format(self.id()))
+            raise ValueError("failed to train {}".format(self.id()))
 
         self.create_report()
 
@@ -212,7 +209,7 @@ def main(output_dir, model_id=None, n_iter=15):
         repository_id=11,
         language="nob",
         corpus_id=NORWEGIAN_NEWS_CORPUS,
-        out=output_dir
+        out=output_dir,
     )
 
     for m in models:
