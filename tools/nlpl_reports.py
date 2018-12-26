@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
 import plac
-import requests
-import ujson
 
 import subprocess
 import sys
-import shutil
 
 from pathlib import Path
 import srsly
@@ -46,8 +43,8 @@ def get_size(start_path):
     return total_size
 
 
-@plac.annotations(output_dir=("Output dir for models", "positional"))
-def main(output_dir):
+@plac.annotations(output_dir=("Output dir for models", "positional"), evaluate=('Run "spacy evaluate" for each model', 'flag', 'e', bool))
+def main(output_dir, evaluate=False):
     output_dir = Path(output_dir)
     reports = []
 
@@ -125,6 +122,15 @@ def main(output_dir):
 
         print_accuracy(report["best"]["meta"]["accuracy"], indent=1)
         print("\n")
+
+        if evaluate:
+            print()
+            print('Evaluate')
+            print('--------')
+            res = subprocess.run([sys.executable, '-m', 'spacy', 'evaluate', '-G', '-g', '1', report['best']['path'], "data/norne-spacy/ud/nob/no-ud-test-ner.json"])
+
+            if res.returncode != 0:
+               print('Evaluation failed!')
 
 
 if __name__ == "__main__":

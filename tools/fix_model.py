@@ -6,25 +6,21 @@ See https://github.com/explosion/spaCy/issues/3093
 """
 
 import plac
-import ujson
+import srsly
 from pathlib import Path
 
 
 def main(model_path):
     model_path = Path(model_path)
+    meta_path = model_path.joinpath("meta.json")
 
-    with model_path.joinpath("meta.json").open(encoding="utf8") as f:
-        meta = ujson.loads(f.read())
-
-    with model_path.joinpath("tagger/cfg").open(encoding="utf8") as f:
-        tagger_cfg = ujson.loads(f.read())
+    meta = srsly.read_json(meta_path)
+    tagger_cfg = srsly.read_json(model_path.joinpath("tagger/cfg"))
 
     meta["vectors"]["name"] = tagger_cfg["pretrained_vectors"]
 
-    print(meta, tagger_cfg)
-
-    with model_path.joinpath("meta.json").open("w", encoding="utf8") as f:
-        f.write(ujson.dumps(meta))
+    srsly.write_json(meta_path, meta)
+    print('fixed')
 
 
 if __name__ == "__main__":
