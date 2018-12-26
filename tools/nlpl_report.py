@@ -84,7 +84,8 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
         reports.append(report)
 
     reports.sort(
-        key=lambda r: r["best"]["meta"]["accuracy"][sort_metric] if "best" in r else 0
+        key=lambda r: r["best"]["meta"]["accuracy"][sort_metric] if "best" in r else 0,
+        reverse=True,
     )
 
     for (idx, report) in enumerate(reports):
