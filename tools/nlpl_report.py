@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 import srsly
 import os
+import re
 
 from .fix_model import fix_model
 
@@ -32,6 +33,17 @@ def print_accuracy(scores, header=True, indent=0):
     ]
 
     print(ind + " ".join(strings))
+
+
+def parse_evaluation(cmd_output):
+    data = {}
+
+    for line in cmd_output.split("\n"):
+        if len(line.strip()) > 0 and not "===" in line:
+            key, val = re.split(r"\s{2,}", line, 2)
+            data[key] = val
+
+    return data
 
 
 def get_size(start_path):
@@ -175,7 +187,10 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
                 if not "===" in line:
                     print("\t", line)
 
+            report["evaluation"] = parse_evaluation(res.stdout)
+
         print("\n")
+        srsly.write_json("nlpl-report.json", reports)
 
 
 if __name__ == "__main__":
