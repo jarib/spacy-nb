@@ -21,8 +21,8 @@ Train tagger/parser
     mkdir data/training
 
     python -m spacy train nb data/training \
-        data/norne-spacy/ud/nob/no-ud-train-ner.jsonl \
-        data/norne-spacy/ud/nob/no-ud-dev-ner.jsonl \
+        data/norne-spacy/ud/nob/no-ud-train-ner.json \
+        data/norne-spacy/ud/nob/no-ud-dev-ner.json \
         --vectors data/nb-base \
         --n-iter 30 \
         --gold-preproc \
