@@ -185,6 +185,7 @@ def main(output_dir, model_id=None, n_iter=15, force=False):
     # fmt: off
     IGNORED = [
         "11-58", # encoding issues
+        "11-165", # not word2vec text
     ]
     # fmt: on
 
