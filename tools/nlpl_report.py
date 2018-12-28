@@ -35,17 +35,6 @@ def print_accuracy(scores, header=True, indent=0):
     print(ind + " ".join(strings))
 
 
-def parse_evaluation(cmd_output):
-    data = {}
-
-    for line in cmd_output.split("\n"):
-        if len(line.strip()) > 0 and not "===" in line:
-            key, val = re.split(r"\s{2,}", line, 2)
-            data[key] = val
-
-    return data
-
-
 def get_size(start_path):
     total_size = 0
 
@@ -125,7 +114,9 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
         print("-------")
 
         print("\tAlgorithm: {}".format(vec["algorithm"]["name"]))
-        print("\tCorpus   : {}".format(", ".join(corp_desc)))
+        print("\tCorpus   : {}".format(" + ".join(corp_desc)))
+        print("\tURL      : http://vectors.nlpl.eu/repository/11/{}.zip".format(vec['id']))
+        
         print(
             "\tVectors  : dimensions={}, window={}, iterations={}, vocab size={}".format(
                 vec["dimensions"],
@@ -187,7 +178,7 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
                 if not "===" in line:
                     print("\t", line)
 
-            report["evaluation"] = parse_evaluation(res.stdout)
+            report["evaluation"] = res.stdout
 
         print("\n")
         srsly.write_json("nlpl-report.json", reports)
