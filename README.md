@@ -12,7 +12,7 @@ Download and unpack pre-trained word2vec model
 
     ./tools/download.vectors.sh
 
-Create spacy model with vectors
+Create spacy model with vectors (add `--prune-vectors N` to reduce model size)
 
     python -m spacy init-model nb data/nb-base --vectors-loc data/vectors/model.txt
 
@@ -28,13 +28,9 @@ Train tagger/parser
         --gold-preproc \
         --use-gpu 1
 
-Make the model loadable (see https://github.com/explosion/spaCy/issues/3093):
-
-    python -m tools.fix_model_cfg data/training/model-final
-
 ## Train word2vec from Norwegian News Corpus (experimental)
 
-**This is currently not scoring well. Using the pre-trained vectors from NLPL appears to work much better.**
+**This is currently not scoring well. The pre-trained vectors from NLPL works a lot better.**
 
 Download and extract [Norwegian News Corpus][nnc] data (2012-2014 subset)
 
