@@ -69,8 +69,6 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
         best_dir = work_dir.joinpath("training/model-best")
 
         if best_dir.exists():
-            fix_model(best_dir)
-
             report["best"] = {
                 "meta": srsly.read_json(model_dir.joinpath("meta.json")),
                 "path": str(best_dir),
