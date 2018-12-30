@@ -10,9 +10,6 @@ import srsly
 import os
 import re
 
-from .fix_model import fix_model
-
-
 def print_accuracy(scores, header=True, indent=0):
     ind = "\t" * indent
 
@@ -62,8 +59,6 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
         model_dirs = list(work_dir.joinpath("training").glob("model[0-9]*"))
 
         for model_dir in model_dirs:
-            fix_model(model_dir)
-
             model = {
                 "meta": srsly.read_json(model_dir.joinpath("meta.json")),
                 "path": str(model_dir),
@@ -159,7 +154,6 @@ def main(output_dir, evaluate=False, sort_metric="ents_f"):
                     "-m",
                     "spacy",
                     "evaluate",
-                    "-G",
                     "-g",
                     "1",
                     report["best"]["path"],
