@@ -25,7 +25,6 @@ Train tagger/parser
         data/norne-spacy/ud/nob/no-ud-dev-ner.json \
         --vectors data/nb-base \
         --n-iter 30 \
-        --gold-preproc \
         --use-gpu 1
 
 ## Train word2vec from Norwegian News Corpus (experimental)
