@@ -21,8 +21,8 @@ Train tagger/parser
     mkdir data/training
 
     python -m spacy train nb data/training \
-        data/norne-spacy/ud/nob/no-ud-train-ner.json \
-        data/norne-spacy/ud/nob/no-ud-dev-ner.json \
+        data/norne-spacy/ud/nob/no_bokmaal-ud-train.json \
+        data/norne-spacy/ud/nob/no_bokmaal-ud-dev.json \
         --vectors data/nb-base \
         --n-iter 30 \
         --use-gpu 1
