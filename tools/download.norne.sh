@@ -3,14 +3,15 @@
 set -e
 set -x
 
+COMMIT="8cd770f0514ea002e3308733639ceef0ca5f1d5c"
 OUTPUT_DIR="data/norne-spacy/ud/nob"
-CHECKOUT_DIR="data/norne"
+CHECKOUT_DIR="data/norne-$COMMIT"
 
 mkdir -p "$OUTPUT_DIR"
 
-[[ -d "$CHECKOUT_DIR" ]] || git clone git@github.com:ltgoslo/norne.git "$CHECKOUT_DIR"
+[[ -d "$CHECKOUT_DIR" ]] || git clone https://github.com/ltgoslo/norne "$CHECKOUT_DIR"
 
-cd $CHECKOUT_DIR && git checkout 8cd770f0514ea002e3308733639ceef0ca5f1d5c && cd -
+cd "$CHECKOUT_DIR" && git checkout "$COMMIT" && cd -
 
 python "$CHECKOUT_DIR/scripts/ud2spacy.py" --outputdir "$OUTPUT_DIR" nob
 
