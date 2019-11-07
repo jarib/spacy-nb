@@ -51,6 +51,16 @@ Init model
 
     python -m spacy init-model nb data/nb-base data/nnc.freqs.txt --vectors-loc data/nnc.vectors.txt
 
+## Entity Linking
+
+    ./tools/download.entity-linking.sh
+    cd data/entity-linking/spacy/bin/wiki_entity_linking/
+    python wikidata_pretrain_kb.py \
+        ../../../entities.json.bz2 \
+        ../../../articles.xml.bz2 \
+        ../../../result \
+        ../../../../nb-lg
+
 ## Links
 
 * [Norwegian News Corpus][nnc]
@@ -59,3 +69,4 @@ Init model
 * [Pre-trained word vectors](http://vectors.nlpl.eu/repository/)
 
 [nnc]: https://www.nb.no/sprakbanken/show?serial=oai%3Anb.no%3Asbr-4&lang=en
+
