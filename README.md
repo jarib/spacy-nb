@@ -16,6 +16,10 @@ Create spacy model with vectors (add `--prune-vectors N` to reduce model size)
 
     python -m spacy init-model nb data/nb-base --vectors-loc data/vectors/model.txt
 
+If you have a GPU, run:
+
+    pip install -U spacy[cuda]
+
 Train tagger/parser
 
     mkdir data/training
@@ -25,7 +29,7 @@ Train tagger/parser
         data/norne-spacy/ud/nob/no_bokmaal-ud-dev.json \
         --vectors data/nb-base \
         --n-iter 30 \
-        --use-gpu 1
+        --use-gpu 0
 
 ## Train word2vec from Norwegian News Corpus (experimental)
 
@@ -53,13 +57,19 @@ Init model
 
 ## Entity Linking
 
-    ./tools/download.entity-linking.sh
+
+Assuming you have a spacy model in `data/nb-lg`:
+
+    ./tools/download.entity-linker.sh
     cd data/entity-linking/spacy/bin/wiki_entity_linking/
+
     python wikidata_pretrain_kb.py \
         ../../../entities.json.bz2 \
         ../../../articles.xml.bz2 \
         ../../../result \
         ../../../../nb-lg
+
+    python wikidata_train_entity_linker.py ../../../result/
 
 ## Links
 
