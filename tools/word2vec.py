@@ -46,7 +46,6 @@ class Corpus(object):
 @plac.annotations(
     in_dir=("Location of input directory with .txt files"),
     out_loc=("Location of output file"),
-    lang=("ISO language code", "option", "l", str),
     n_workers=("Number of workers", "option", "n", int),
     size=("Dimension of the word vectors", "option", "d", int),
     window=("Context window size", "option", "w", int),
@@ -63,7 +62,7 @@ def main(
     window=5,
     size=128,
     min_count=10,
-    nr_iter=2,
+    nr_iter=5,
 ):
     logging.basicConfig(
         format="%(asctime)s : %(levelname)s : %(message)s", level=logging.INFO
@@ -75,6 +74,9 @@ def main(
     if not out_loc.parent.exists():
         raise ValueError("dir of output path does not exist {}".format(out_loc.parent))
 
+    if out_loc.is_dir():
+        raise ValueError("output path is a directory {}".format(out_loc))
+
     model = Word2Vec(
         size=size,
         window=window,
@@ -85,7 +87,7 @@ def main(
         iter=nr_iter,
     )
 
-    nlp = spacy.blank(lang)
+    nlp = spacy.load("nb_core_news_sm", disable=["tagger", "parser", "ner"])
 
     total_words = 0
     total_sents = 0
@@ -94,9 +96,14 @@ def main(
     corpus = Corpus(in_dir)
 
     for text_no, text in enumerate(corpus):
+        length = len(text)
+
+        if length >= nlp.max_length:
+            nlp.max_length = length
+
         sent_count = text.count("\n")
         total_sents += sent_count
-        total_size += len(text)
+        total_size += length
 
         doc = nlp(text)
         total_words += len(doc)
