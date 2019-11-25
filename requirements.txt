@@ -56,7 +56,8 @@ s3transfer==0.1.13
 scipy==1.2.0
 six==1.12.0
 smart-open==1.7.1
-spacy==2.2.2
+#spacy==2.2.2
+git+https://github.com/jarib/spaCy.git@update-nb-tag-map
 spacy-lookups-data==0.2.0
 srsly==0.2.0
 thinc==7.3.1
