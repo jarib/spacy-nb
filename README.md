@@ -12,7 +12,7 @@ Download and unpack pre-trained word2vec model
 
     ./tools/download.vectors.sh
 
-Create spacy model with vectors (add `--prune-vectors N` to reduce model size)
+Create spacy model with vectors (add `--prune-vectors N` to reduce model size, e.g. 20000 for `md`)
 
     python -m spacy init-model nb data/nb-base --vectors-loc data/vectors/model.txt
 
